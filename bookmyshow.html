@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BookMyShow — Movies, Events, Plays & Sports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET & TOKENS ───────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bms-red:     #e5374b;
+  --bms-dark-red:#c22237;
+  --bms-black:   #1a1a1a;
+  --bms-dark:    #222222;
+  --bms-charcoal:#2e2e2e;
+  --bms-gray:    #666666; /* Darkened for much better reading contrast */
+  --bms-silver:  #cccccc;
+  --bms-light:   #f8f9fa;
+  --bms-white:   #ffffff;
+  --bms-yellow:  #f5a623;
+  --bms-green:   #2dc76d;
+  --bms-blue:    #3a7bd5;
+  --nav-h:       76px; /* Increased to fit larger text */
+  --sub-nav-h:   60px; /* Increased to fit larger text */
+  --r:           12px;
+  --ff: 'Nunito', sans-serif;
+  --ff2: 'Poppins', sans-serif;
+  --trans: .3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 🌟 MAGIC SCALING TRICK 🌟
+   Setting this to 18px (default is 16px) scales up ALL 'rem' values globally by ~12.5%.
+*/
+html { scroll-behavior: smooth; font-size: 18px; }
+
+body { font-family: var(--ff); background: var(--bms-light); color: var(--bms-black); overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+img { display: block; }
+ul { list-style: none; }
+
+/* ── TOP NAV ─────────────────────────────────── */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--bms-black);
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(16px, 4vw, 50px);
+  gap: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+}
+
+.bms-logo {
+  font-family: var(--ff2);
+  font-size: 1.8rem; /* Markedly larger */
+  font-weight: 800;
+  color: var(--bms-white);
+  letter-spacing: -.02em;
+  flex-shrink: 0;
+}
+.bms-logo span { color: var(--bms-red); }
+
+/* city selector */
+.city-sel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--bms-silver);
+  font-size: 1.05rem; /* Larger */
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.12);
+  transition: var(--trans);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.city-sel:hover { background: rgba(255,255,255,.1); color: var(--bms-white); }
+.city-sel .arrow { font-size: .8rem; opacity: .7; }
+
+/* search */
+.nav-search {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 12px 20px;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: var(--trans);
+}
+.nav-search:focus-within { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.3); box-shadow: 0 0 0 3px rgba(255,255,255,0.05); }
+.nav-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--ff);
+  font-size: 1.05rem; /* Larger */
+  color: var(--bms-white);
+}
+.nav-search input::placeholder { color: rgba(255,255,255,.5); }
+.nav-search .s-icon { color: rgba(255,255,255,.5); font-size: 1.2rem; }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.btn-signin {
+  font-family: var(--ff);
+  font-weight: 800;
+  font-size: 1.05rem; /* Larger */
+  color: var(--bms-white);
+  background: var(--bms-red);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: var(--trans);
+  white-space: nowrap;
+}
+.btn-signin:hover { background: var(--bms-dark-red); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229,55,75,.4); }
+
+.nav-list-btn {
+  font-size: 1rem;
+  color: var(--bms-silver);
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: var(--trans);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-list-btn:hover { color: var(--bms-white); background: rgba(255,255,255,.1); }
+
+/* hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: auto;
+}
+.hamburger span { display: block; width: 30px; height: 3px; background: var(--bms-white); border-radius: 3px; transition: var(--trans); }
+
+/* ── SUB NAV ─────────────────────────────────── */
+.sub-nav {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 190;
+  background: var(--bms-charcoal);
+  height: var(--sub-nav-h);
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(16px, 4vw, 50px);
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sub-nav::-webkit-scrollbar { display: none; }
+
+.sub-link {
+  font-size: 1rem; /* Larger */
+  font-weight: 600;
+  color: rgba(255,255,255,.75);
+  padding: 12px 22px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: var(--trans);
+  letter-spacing: .02em;
+  flex-shrink: 0;
+}
+.sub-link:hover { color: var(--bms-white); background: rgba(255,255,255,.1); }
+.sub-link.active { color: var(--bms-white); border-bottom: 3px solid var(--bms-red); background: transparent; font-weight: 800; }
+
+/* ── HERO / BANNER ───────────────────────────── */
+.hero-slider {
+  position: relative;
+  overflow: hidden;
+  background: var(--bms-black);
+}
+.hero-img {
+  width: 100%;
+  height: clamp(400px, 50vw, 650px); /* Taller to fit bigger text */
+  object-fit: cover;
+  display: block;
+  opacity: .75;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(26,26,26,1) 0%,
+    rgba(26,26,26,.7) 50%,
+    transparent 80%
+  );
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(20px, 5vw, 70px);
+}
+.hero-text { max-width: 650px; }
+.hero-badge {
+  display: inline-block;
+  background: var(--bms-red);
+  color: var(--bms-white);
+  font-size: .9rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  animation: fadeUp .6s .1s both;
+}
+.hero-text h1 {
+  font-family: var(--ff2);
+  font-size: clamp(2.5rem, 6vw, 4.5rem); /* Massive and clear */
+  font-weight: 800;
+  color: var(--bms-white);
+  line-height: 1.15;
+  margin-bottom: 16px;
+  animation: fadeUp .6s .2s both;
+}
+.hero-text p {
+  font-size: clamp(1.1rem, 1.8vw, 1.3rem); /* Very readable description */
+  color: rgba(255,255,255,.85);
+  line-height: 1.6;
+  margin-bottom: 36px;
+  animation: fadeUp .6s .3s both;
+  font-weight: 500;
+}
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: fadeUp .6s .4s both;
+}
+.btn-book {
+  font-family: var(--ff);
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: var(--bms-red);
+  color: var(--bms-white);
+  border: none;
+  border-radius: 8px;
+  padding: 16px 36px;
+  cursor: pointer;
+  transition: var(--trans);
+  letter-spacing: .03em;
+}
+.btn-book:hover { background: var(--bms-dark-red); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(229,55,75,.4); }
+.btn-trailer {
+  font-family: var(--ff);
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: rgba(255,255,255,.05);
+  color: var(--bms-white);
+  border: 2px solid rgba(255,255,255,.6);
+  border-radius: 8px;
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: var(--trans);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-trailer:hover { border-color: var(--bms-white); background: rgba(255,255,255,.15); transform: translateY(-3px); }
+
+/* ── QUICK FILTERS ───────────────────────────── */
+.quick-filters {
+  background: var(--bms-white);
+  padding: 24px clamp(16px, 4vw, 50px);
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid #e8e8e8;
+}
+.quick-filters::-webkit-scrollbar { display: none; }
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 2px solid #eaeaea;
+  font-size: 1.05rem; /* Larger */
+  font-weight: 800;
+  color: #333;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--trans);
+  flex-shrink: 0;
+  background: var(--bms-white);
+}
+.filter-chip:hover, .filter-chip.active {
+  background: var(--bms-red);
+  border-color: var(--bms-red);
+  color: var(--bms-white);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229,55,75,.25);
+}
+
+/* ── SECTION WRAPPER ─────────────────────────── */
+.section { padding: 56px clamp(16px, 4vw, 50px); }
+.section + .section { padding-top: 0; }
+
+.sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+.sec-title {
+  font-family: var(--ff2);
+  font-size: clamp(1.6rem, 3vw, 2.2rem); /* Larger Section Headings */
+  font-weight: 800;
+  color: var(--bms-black);
+}
+.sec-title span { display: block; font-size: 1.1rem; font-weight: 600; color: var(--bms-gray); font-family: var(--ff); margin-top: 6px; }
+.see-all {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--bms-red);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--trans);
+  white-space: nowrap;
+}
+.see-all:hover { gap: 12px; color: var(--bms-dark-red); }
+.see-all::after { content: '›'; font-size: 1.6rem; line-height: 1; }
+
+/* ── MOVIE CARDS ROW ─────────────────────────── */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+
+.movie-card {
+  background: var(--bms-white);
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--trans);
+  box-shadow: 0 4px 12px rgba(0,0,0,.04);
+}
+.movie-card:hover { transform: translateY(-8px); box-shadow: 0 16px 40px rgba(0,0,0,.15); }
+
+.mc-poster {
+  position: relative;
+  padding-top: 150%;
+  overflow: hidden;
+  background: #eee;
+}
+.mc-poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.movie-card:hover .mc-poster img { transform: scale(1.08); }
+
+.mc-rating {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0,0,0,.85);
+  color: var(--bms-yellow);
+  font-size: .95rem; /* Larger */
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mc-rating::before { content: '★'; font-size: 1.1rem; }
+
+.mc-new {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--bms-green);
+  color: var(--bms-white);
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+.mc-lang {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,.8);
+  color: var(--bms-white);
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.mc-info { padding: 20px; }
+.mc-title { font-size: 1.25rem; font-weight: 800; color: var(--bms-black); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc-genre { font-size: 1rem; font-weight: 500; color: var(--bms-gray); margin-bottom: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.btn-bms {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: 2px solid var(--bms-red);
+  color: var(--bms-red);
+  font-family: var(--ff);
+  font-weight: 800;
+  font-size: 1.05rem; /* Larger button text */
+  letter-spacing: .04em;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--trans);
+}
+.btn-bms:hover { background: var(--bms-red); color: var(--bms-white); }
+
+/* ── WHY BOOKMYSHOW — FEATURES ────────────────── */
+.features-band {
+  background: var(--bms-white);
+  margin: 0 0 24px;
+  padding: 80px clamp(16px, 4vw, 50px);
+  border-top: 6px solid var(--bms-red);
+}
+.features-head {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.features-head .badge {
+  display: inline-block;
+  background: rgba(229,55,75,.1);
+  color: var(--bms-red);
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: 30px;
+  margin-bottom: 16px;
+}
+.features-head h2 {
+  font-family: var(--ff2);
+  font-size: clamp(2rem, 4vw, 3rem); /* Much larger */
+  font-weight: 800;
+  color: var(--bms-black);
+  margin-bottom: 16px;
+}
+.features-head p { font-size: 1.2rem; color: var(--bms-gray); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.feat-card {
+  border-radius: 16px;
+  padding: 48px 32px;
+  border: 2px solid #f0f0f0;
+  text-align: center;
+  transition: var(--trans);
+  position: relative;
+  overflow: hidden;
+  background: var(--bms-white);
+}
+.feat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--accent, var(--bms-red));
+  transform: scaleX(0);
+  transition: var(--trans);
+}
+.feat-card:hover { transform: translateY(-8px); box-shadow: 0 20px 48px rgba(0,0,0,.08); border-color: transparent; }
+.feat-card:hover::after { transform: scaleX(1); }
+
+.feat-icon-wrap {
+  width: 90px; height: 90px;
+  border-radius: 24px;
+  background: var(--icon-bg, rgba(229,55,75,.08));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 28px;
+  transition: var(--trans);
+}
+.feat-card:hover .feat-icon-wrap { transform: scale(1.1) rotate(-6deg); }
+.feat-card h3 { font-family: var(--ff2); font-size: 1.4rem; font-weight: 700; color: var(--bms-black); margin-bottom: 14px; }
+.feat-card p { font-size: 1.05rem; color: var(--bms-gray); line-height: 1.7; }
+
+/* ── EVENTS ROW ───────────────────────────────── */
+.events-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.event-card {
+  background: var(--bms-white);
+  border-radius: var(--r);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--trans);
+  box-shadow: 0 4px 12px rgba(0,0,0,.04);
+}
+.event-card:hover { transform: translateY(-8px); box-shadow: 0 16px 40px rgba(0,0,0,.15); }
+.ev-img { position: relative; height: 220px; overflow: hidden; background: #eee; }
+.ev-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.event-card:hover .ev-img img { transform: scale(1.08); }
+.ev-cat {
+  position: absolute;
+  top: 16px; left: 16px;
+  background: var(--bms-red);
+  color: var(--bms-white);
+  font-size: .85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.ev-info { padding: 24px; }
+.ev-title { font-size: 1.25rem; font-weight: 800; color: var(--bms-black); margin-bottom: 10px; }
+.ev-venue { font-size: 1.05rem; color: var(--bms-gray); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+.ev-date {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+.ev-date .date { color: var(--bms-red); }
+.ev-date .price { color: var(--bms-green); }
+
+/* ── OFFER STRIP ─────────────────────────────── */
+.offer-strip {
+  background: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+  margin: 0 clamp(16px,4vw,50px) 32px;
+  border-radius: 24px;
+  padding: clamp(40px, 6vw, 80px) clamp(40px, 6vw, 80px);
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 32px rgba(0,0,0,.15);
+}
+.offer-strip::before {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 50%;
+  background: linear-gradient(135deg, transparent, rgba(229,55,75,.3));
+  pointer-events: none;
+}
+.offer-text { flex: 1; position: relative; z-index: 1; }
+.offer-tag {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--bms-yellow);
+  margin-bottom: 16px;
+}
+.offer-text h2 {
+  font-family: var(--ff2);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--bms-white);
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.offer-text p { font-size: 1.2rem; color: rgba(255,255,255,.8); line-height: 1.6; margin-bottom: 40px; max-width: 500px; }
+.offer-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+.offer-img {
+  flex-shrink: 0;
+  width: 300px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 24px 56px rgba(0,0,0,.5);
+}
+.offer-img img { width: 100%; height: 380px; object-fit: cover; }
+
+/* ── TESTIMONIALS ────────────────────────────── */
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.testi-card {
+  background: var(--bms-white);
+  border-radius: var(--r);
+  padding: 40px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.05);
+  border: 1px solid #f0f0f0;
+  transition: var(--trans);
+}
+.testi-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,.1); border-color: transparent; }
+.testi-stars { color: var(--bms-yellow); font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+.testi-quote { font-size: 1.1rem; color: #444; line-height: 1.8; font-style: italic; margin-bottom: 32px; }
+.testi-user { display: flex; align-items: center; gap: 20px; }
+.testi-av { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bms-light); flex-shrink: 0; }
+.testi-name { font-weight: 800; font-size: 1.1rem; color: var(--bms-black); }
+.testi-loc { font-size: .95rem; color: var(--bms-gray); margin-top: 4px; }
+
+/* ── APP BANNER ──────────────────────────────── */
+.app-banner {
+  background: var(--bms-red);
+  padding: 64px clamp(16px,4vw,50px);
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+.app-text h2 {
+  font-family: var(--ff2);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: var(--bms-white);
+  margin-bottom: 16px;
+}
+.app-text p { font-size: 1.2rem; color: rgba(255,255,255,.9); margin-bottom: 32px; }
+.store-btns { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.store-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bms-black);
+  color: var(--bms-white);
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: var(--trans);
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.store-btn:hover { background: #333; transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.3); }
+.store-btn .icon { font-size: 1.8rem; }
+
+/* ── FOOTER ──────────────────────────────────── */
+footer {
+  background: var(--bms-black);
+  color: rgba(255,255,255,.6);
+  padding: 80px clamp(16px,4vw,50px) 40px;
+}
+.foot-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 56px;
+  margin-bottom: 80px;
+}
+.foot-brand .bms-logo { font-size: 1.8rem; margin-bottom: 24px; display: block; }
+.foot-brand p { font-size: 1.1rem; line-height: 1.8; max-width: 360px; margin-bottom: 32px; }
+.foot-socials { display: flex; gap: 16px; }
+.soc {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: var(--trans);
+  color: rgba(255,255,255,.8);
+}
+.soc:hover { background: var(--bms-red); border-color: var(--bms-red); color: var(--bms-white); transform: translateY(-4px); }
+
+.foot-col h4 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.9);
+  margin-bottom: 28px;
+}
+.foot-col ul { display: flex; flex-direction: column; gap: 16px; }
+.foot-col ul a { font-size: 1.05rem; transition: var(--trans); }
+.foot-col ul a:hover { color: var(--bms-white); padding-left: 8px; }
+
+.foot-bottom {
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 1rem;
+}
+.foot-links { display: flex; gap: 32px; }
+.foot-links a { font-size: 1rem; transition: var(--trans); }
+.foot-links a:hover { color: var(--bms-white); }
+
+/* ── ANIMATIONS ──────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media(max-width:1200px) {
+  .cards-row { grid-template-columns: repeat(4, 1fr); }
+  .events-row { grid-template-columns: repeat(3, 1fr); }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width:900px) {
+  :root { --nav-h: 68px; }
+  .nav-search { display: none; }
+  .city-sel, .nav-list-btn { display: none; }
+  .hamburger { display: flex; }
+  .nav-right { margin-left: 0; }
+  .cards-row { grid-template-columns: repeat(3, 1fr); }
+  .events-row { grid-template-columns: repeat(2, 1fr); }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .testi-grid { grid-template-columns: 1fr 1fr; }
+  .offer-strip { flex-direction: column; text-align: center; }
+  .offer-btns { justify-content: center; }
+  .offer-img { width: 100%; max-width: 450px; }
+  .offer-img img { height: 300px; }
+  .foot-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
+  .foot-brand { grid-column: 1/-1; }
+}
+@media(max-width:650px) {
+  .cards-row { grid-template-columns: repeat(2, 1fr); }
+  .feat-grid { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .hero-text h1 { font-size: 2.5rem; }
+  .foot-grid { grid-template-columns: 1fr; }
+  .foot-links { flex-wrap: wrap; gap: 16px; }
+}
+@media(max-width:480px) {
+  .cards-row { grid-template-columns: 1fr; }
+  .events-row { grid-template-columns: 1fr; }
+}
+
+/* mobile nav overlay */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: var(--nav-h) 0 0 0;
+  background: rgba(26,26,26,.98);
+  z-index: 195;
+  padding: 40px 32px;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.8);
+  padding: 16px 20px;
+  border-radius: 12px;
+  transition: var(--trans);
+}
+.mobile-nav a:hover { background: rgba(255,255,255,.1); color: var(--bms-white); padding-left: 28px; }
+.mobile-search {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  gap: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.mobile-search input {
+  flex: 1; border: none; background: transparent;
+  font-family: var(--ff); font-size: 1.15rem;
+  color: var(--bms-white); outline: none;
+}
+.mobile-search input::placeholder { color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="#" class="bms-logo">bookmyshow<span>.</span></a>
+
+  <div class="city-sel" onclick="alert('City selector')">
+    📍 Bengaluru <span class="arrow">▼</span>
+  </div>
+
+  <div class="nav-search">
+    <span class="s-icon">🔍</span>
+    <input type="text" placeholder='Search for Movies, Events, Plays, Sports and Activities'>
+  </div>
+
+  <div class="nav-right">
+    <a href="#" class="nav-list-btn">✚ List Your Show</a>
+    <button class="btn-signin">Sign In</button>
+  </div>
+
+  <div class="hamburger" id="ham" onclick="toggleMobileNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-search">
+    <span style="color:rgba(255,255,255,.5)">🔍</span>
+    <input type="text" placeholder="Search movies, events…">
+  </div>
+  <a href="#movies" onclick="closeMobileNav()">🎬 Movies</a>
+  <a href="#events" onclick="closeMobileNav()">🎵 Stream</a>
+  <a href="#events" onclick="closeMobileNav()">🎤 Events</a>
+  <a href="#events" onclick="closeMobileNav()">🎭 Plays</a>
+  <a href="#events" onclick="closeMobileNav()">⚽ Sports</a>
+  <a href="#offers" onclick="closeMobileNav()">🏷️ Offers</a>
+</div>
+
+<div class="sub-nav">
+  <a href="#movies" class="sub-link active">Movies</a>
+  <a href="#" class="sub-link">Stream</a>
+  <a href="#events" class="sub-link">Events</a>
+  <a href="#events" class="sub-link">Plays</a>
+  <a href="#events" class="sub-link">Sports</a>
+  <a href="#events" class="sub-link">Activities</a>
+  <a href="#events" class="sub-link">Laughter Carnival</a>
+  <a href="#" class="sub-link">Gift Cards</a>
+  <a href="#" class="sub-link">Exclusives</a>
+</div>
+
+<div class="hero-slider">
+  <img class="hero-img" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&q=80" alt="Featured Movie">
+  <div class="hero-overlay">
+    <div class="hero-text">
+      <div class="hero-badge">Now In Cinemas</div>
+      <h1>Orbital Drift</h1>
+      <p>A breathtaking sci-fi epic that pushes the boundaries of human exploration. Witness the future of cinema.</p>
+      <div class="hero-actions">
+        <button class="btn-book">Book Tickets</button>
+        <button class="btn-trailer">▶ Watch Trailer</button>
+      </div>
+    </div>
+  </div>
+  <div class="slider-dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<div class="quick-filters">
+  <div class="filter-chip active">🎬 All</div>
+  <div class="filter-chip">🎭 Hindi</div>
+  <div class="filter-chip">🎞 English</div>
+  <div class="filter-chip">🗣 Kannada</div>
+  <div class="filter-chip">🎙 Telugu</div>
+  <div class="filter-chip">🎪 Tamil</div>
+  <div class="filter-chip">✅ Available Today</div>
+  <div class="filter-chip">⭐ Top Rated</div>
+  <div class="filter-chip">🆕 New Releases</div>
+</div>
+
+<section class="section" id="movies">
+  <div class="sec-header">
+    <div class="sec-title">Recommended Movies <span>in Bengaluru</span></div>
+    <a href="#" class="see-all">See All</a>
+  </div>
+  <div class="cards-row">
+
+    <div class="movie-card">
+      <div class="mc-poster">
+        <img src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC,e-usm-2-2-0.5-0.008:w-400.0,h-660.0,cm-pad_resize,bg-000000,fo-top:l-image,i-discovery-catalog@@icons@@star-icon-202203010609.png,lx-24,ly-615,w-29,l-end:l-text,ie-OS41LzEwICA0MjNLKyBWb3Rlcw%3D%3D,fs-29,co-FFFFFF,ly-612,lx-70,pa-8_0_0_0,l-end/et00478890-gseacbrsej-portrait.jpg" alt="Dhurandhar The Revenge">
+        <div class="mc-rating">9.5/10</div>
+        <div class="mc-lang">Hindi</div>
+      </div>
+      <div class="mc-info">
+        <div class="mc-title">Dhurandhar The Revenge</div>
+        <div class="mc-genre">Action/Thriller</div>
+        <div style="font-size:1rem;color:var(--bms-gray);margin-bottom:14px;font-weight:600;">⭐ 423K+ Votes</div>
+        <a href="#" class="btn-bms">Book Tickets</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="mc-poster">
+        <img src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC,e-usm-2-2-0.5-0.008:w-400.0,h-660.0,cm-pad_resize,bg-000000,fo-top:l-image,i-discovery-catalog@@icons@@star-icon-202203010609.png,lx-24,ly-615,w-29,l-end:l-text,ie-OS4yLzEwICA5LjRLKyBWb3Rlcw%3D%3D,fs-29,co-FFFFFF,ly-612,lx-70,pa-8_0_0_0,l-end/et00490658-wcmkllrrrf-portrait.jpg" alt="Love Mocktail 3">
+        <div class="mc-rating">9.2/10</div>
+        <div class="mc-lang">Kannada</div>
+      </div>
+      <div class="mc-info">
+        <div class="mc-title">Love Mocktail 3</div>
+        <div class="mc-genre">Drama/Family</div>
+        <div style="font-size:1rem;color:var(--bms-gray);margin-bottom:14px;font-weight:600;">⭐ 9.4K+ Votes</div>
+        <a href="#" class="btn-bms">Book Tickets</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="mc-poster">
+        <img src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC,e-usm-2-2-0.5-0.008:w-400.0,h-660.0,cm-pad_resize,bg-000000,fo-top:l-image,i-discovery-catalog@@icons@@star-icon-202203010609.png,lx-24,ly-615,w-29,l-end:l-text,ie-OS4xLzEwICAxNy43SysgVm90ZXM%3D,fs-29,co-FFFFFF,ly-612,lx-70,pa-8_0_0_0,l-end/et00451760-bqrmlwxxqs-portrait.jpg" alt="Project Hail Mary">
+        <div class="mc-new">Trending</div>
+        <div class="mc-rating">9.1/10</div>
+        <div class="mc-lang">English</div>
+      </div>
+      <div class="mc-info">
+        <div class="mc-title">Project Hail Mary</div>
+        <div class="mc-genre">Adventure/Sci-Fi</div>
+        <div style="font-size:1rem;color:var(--bms-gray);margin-bottom:14px;font-weight:600;">⭐ 17.7K+ Votes</div>
+        <a href="#" class="btn-bms">Book Tickets</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="mc-poster">
+        <img src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC,e-usm-2-2-0.5-0.008:w-400.0,h-660.0,cm-pad_resize,bg-000000,fo-top:l-image,i-discovery-catalog@@icons@@star-icon-202203010609.png,lx-24,ly-615,w-29,l-end:l-text,ie-OC45LzEwICAyMEsrIFZvdGVz,fs-29,co-FFFFFF,ly-612,lx-70,pa-8_0_0_0,l-end/et00485590-falfgfyrre-portrait.jpg" alt="Youth">
+        <div class="mc-rating">8.9/10</div>
+        <div class="mc-lang">Telugu</div>
+      </div>
+      <div class="mc-info">
+        <div class="mc-title">Youth</div>
+        <div class="mc-genre">Comedy/Romantic</div>
+        <div style="font-size:1rem;color:var(--bms-gray);margin-bottom:14px;font-weight:600;">⭐ 20K+ Votes</div>
+        <a href="#" class="btn-bms">Book Tickets</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="mc-poster">
+        <img src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC,e-usm-2-2-0.5-0.008:w-400.0,h-660.0,cm-pad_resize,bg-000000,fo-top:l-image,i-discovery-catalog@@icons@@star-icon-202203010609.png,lx-24,ly-615,w-29,l-end:l-text,ie-Ny45LzEwICA1My41SysgVm90ZXM%3D,fs-29,co-FFFFFF,ly-612,lx-70,pa-8_0_0_0,l-end/et00489871-dkqapnzefa-portrait.jpg" alt="Aadu 3">
+        <div class="mc-rating">7.9/10</div>
+        <div class="mc-lang">Malayalam</div>
+      </div>
+      <div class="mc-info">
+        <div class="mc-title">Aadu 3</div>
+        <div class="mc-genre">Comedy/Fantasy</div>
+        <div style="font-size:1rem;color:var(--bms-gray);margin-bottom:14px;font-weight:600;">⭐ 53.5K+ Votes</div>
+        <a href="#" class="btn-bms">Book Tickets</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="features-band">
+  <div class="features-head">
+    <div class="badge">Why BookMyShow</div>
+    <h2>India's Largest Entertainment Platform</h2>
+    <p>Over 20 years of bringing unforgettable moments to more than 25 million fans every month.</p>
+  </div>
+  <div class="feat-grid">
+
+    <div class="feat-card" style="--accent:#e5374b;--icon-bg:rgba(229,55,75,.08)">
+      <div class="feat-icon-wrap">⚡</div>
+      <h3>Lightning-Fast Booking</h3>
+      <p>Reserve your seat in under 60 seconds. Our seamless checkout is optimised for every device, from mobile to desktop.</p>
+    </div>
+
+    <div class="feat-card" style="--accent:#3a7bd5;--icon-bg:rgba(58,123,213,.08)">
+      <div class="feat-icon-wrap">🗺️</div>
+      <h3>Interactive Seat Maps</h3>
+      <p>Hand-pick your perfect spot with real-time interactive venue maps. Front row, balcony, VIP — the choice is yours.</p>
+    </div>
+
+    <div class="feat-card" style="--accent:#f5a623;--icon-bg:rgba(245,166,35,.08)">
+      <div class="feat-icon-wrap">🏷️</div>
+      <h3>Exclusive Bank Offers</h3>
+      <p>Unlock up to 50% off with HDFC, SBI, ICICI, Axis and more. Members-only deals available round the year.</p>
+    </div>
+
+    <div class="feat-card" style="--accent:#2dc76d;--icon-bg:rgba(45,199,109,.08)">
+      <div class="feat-icon-wrap">📱</div>
+      <h3>Digital M-Tickets</h3>
+      <p>Your ticket lives on your phone. Show the QR code at the gate — no printouts, no waiting, pure convenience.</p>
+    </div>
+
+    <div class="feat-card" style="--accent:#c026d3;--icon-bg:rgba(192,38,211,.08)">
+      <div class="feat-icon-wrap">🔔</div>
+      <h3>Smart Notifications</h3>
+      <p>Get personalised alerts for new releases, restocked seats, and events that match your taste and location.</p>
+    </div>
+
+    <div class="feat-card" style="--accent:#e5374b;--icon-bg:rgba(229,55,75,.08)">
+      <div class="feat-icon-wrap">⭐</div>
+      <h3>Verified Reviews</h3>
+      <p>Real ratings from real attendees. Our community reviews help you decide what's truly worth your evening.</p>
+    </div>
+
+  </div>
+</div>
+
+<section class="section" id="events">
+  <div class="sec-header">
+    <div class="sec-title">Upcoming Events <span>in Bengaluru</span></div>
+    <a href="#" class="see-all">See All</a>
+  </div>
+  <div class="events-row">
+
+    <div class="event-card">
+      <div class="ev-img">
+        <img src="https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=500&q=80" alt="Concert">
+        <div class="ev-cat">Concert</div>
+      </div>
+      <div class="ev-info">
+        <div class="ev-title">Prateek Kuhad Live</div>
+        <div class="ev-venue">📍 Bangalore Palace Grounds</div>
+        <div class="ev-date">
+          <span class="date">Apr 18, Sat</span>
+          <span class="price">From ₹999</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="ev-img">
+        <img src="https://images.unsplash.com/photo-1487700160041-babef9c3cb55?w=500&q=80" alt="Comedy">
+        <div class="ev-cat">Comedy</div>
+      </div>
+      <div class="ev-info">
+        <div class="ev-title">The Great Indian Laughter Show</div>
+        <div class="ev-venue">📍 Chowdaiah Memorial Hall</div>
+        <div class="ev-date">
+          <span class="date">Apr 25, Sat</span>
+          <span class="price">From ₹599</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="ev-img">
+        <img src="https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=500&q=80" alt="Theatre">
+        <div class="ev-cat">Play</div>
+      </div>
+      <div class="ev-info">
+        <div class="ev-title">Mughal-E-Azam: The Musical</div>
+        <div class="ev-venue">📍 Ravindra Kalakshetra</div>
+        <div class="ev-date">
+          <span class="date">May 3, Sat</span>
+          <span class="price">From ₹799</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="ev-img">
+        <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=500&q=80" alt="Sports">
+        <div class="ev-cat">Sports</div>
+      </div>
+      <div class="ev-info">
+        <div class="ev-title">RCB vs MI — IPL 2026</div>
+        <div class="ev-venue">📍 M. Chinnaswamy Stadium</div>
+        <div class="ev-date">
+          <span class="date">May 7, Thu</span>
+          <span class="price">From ₹1,200</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="offer-strip" id="offers">
+  <div class="offer-text">
+    <div class="offer-tag">🏷️ Limited Time Offer</div>
+    <h2>Save Up To 50%<br>This Weekend</h2>
+    <p>Use your HDFC, SBI, or Axis card and unlock massive savings on movies, live events & more across Bengaluru.</p>
+    <div class="offer-btns">
+      <button class="btn-book">Claim Offer Now</button>
+      <button class="btn-trailer">View All Deals</button>
+    </div>
+  </div>
+  <div class="offer-img">
+    <img src="https://images.unsplash.com/photo-1510924199351-4e9d94df18a6?w=500&q=80" alt="Offer">
+  </div>
+</div>
+
+<section class="section">
+  <div class="sec-header">
+    <div class="sec-title">Loved By Millions <span>What our fans say</span></div>
+  </div>
+  <div class="testi-grid">
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Booked tickets for the RCB match in under a minute! The seat map is incredibly intuitive and the digital ticket worked perfectly at the gate."</p>
+      <div class="testi-user">
+        <img class="testi-av" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt="Ananya">
+        <div>
+          <div class="testi-name">Ananya Sharma</div>
+          <div class="testi-loc">📍 Koramangala, Bengaluru</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"The smart alerts saved my date-night! Got notified when IMAX seats opened for a sold-out show. Grabbed two instantly. Absolute lifesaver!"</p>
+      <div class="testi-user">
+        <img class="testi-av" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Rahul">
+        <div>
+          <div class="testi-name">Rahul Verma</div>
+          <div class="testi-loc">📍 Indiranagar, Bengaluru</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-card">
+      <div class="testi-stars">★★★★☆</div>
+      <p class="testi-quote">"Saved over ₹1,200 on a family outing with my HDFC card offer. App is smooth, checkout is fast. We use BookMyShow for every plan!"</p>
+      <div class="testi-user">
+        <img class="testi-av" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80" alt="Priya">
+        <div>
+          <div class="testi-name">Priya Nair</div>
+          <div class="testi-loc">📍 Whitefield, Bengaluru</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="app-banner">
+  <div class="app-text">
+    <h2>Download the BookMyShow App</h2>
+    <p>Book tickets on the go. Get exclusive app-only offers and instant notifications.</p>
+    <div class="store-btns">
+      <a href="#" class="store-btn"><span class="icon">🍎</span><div><div style="font-size:.8rem;opacity:.8">Download on the</div>App Store</div></a>
+      <a href="#" class="store-btn"><span class="icon">▶</span><div><div style="font-size:.8rem;opacity:.8">Get it on</div>Google Play</div></a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <a href="#" class="bms-logo">bookmyshow<span style="color:var(--bms-red)">.</span></a>
+      <p>India's largest entertainment ticketing platform. Book tickets for movies, events, plays, sports & activities across 650+ cities.</p>
+      <div class="foot-socials">
+        <a href="#" class="soc" aria-label="Twitter">𝕏</a>
+        <a href="#" class="soc" aria-label="Instagram">📸</a>
+        <a href="#" class="soc" aria-label="Facebook">f</a>
+        <a href="#" class="soc" aria-label="YouTube">▶</a>
+        <a href="#" class="soc" aria-label="LinkedIn">in</a>
+      </div>
+    </div>
+
+    <div class="foot-col">
+      <h4>Movies</h4>
+      <ul>
+        <li><a href="#">Now Showing</a></li>
+        <li><a href="#">Upcoming</a></li>
+        <li><a href="#">Top Rated</a></li>
+        <li><a href="#">Multiplex</a></li>
+        <li><a href="#">IMAX & 4DX</a></li>
+        <li><a href="#">Kannada Films</a></li>
+      </ul>
+    </div>
+
+    <div class="foot-col">
+      <h4>Events & More</h4>
+      <ul>
+        <li><a href="#">Concerts</a></li>
+        <li><a href="#">Comedy Shows</a></li>
+        <li><a href="#">Theatre & Plays</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="#">Kids Activities</a></li>
+        <li><a href="#">Workshops</a></li>
+      </ul>
+    </div>
+
+    <div class="foot-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Partner With Us</a></li>
+        <li><a href="#">Help & Support</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot-bottom">
+    <span>© 2026 Bigtree Entertainment Pvt. Ltd. All Rights Reserved.</span>
+    <div class="foot-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Cancellations & Refunds</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
